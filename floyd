@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <limits.h>
+int path[100][100];
+void find(int u,int v,int adj[][100])
+{
+    if(path[u][v]==0||adj[u][v]==-1)
+    return;
+    printf("Path from %d to %d: ",u,v);
+    int t=u;
+    printf("%d ",u);
+    while(t!=v)
+    {
+        t=path[t][v];
+        printf("-> %d",t);
+    }
+    printf(" : %d\n",adj[u][v]);
+}
+void print(int adj[][100],int v)
+{
+    for(int i=1;i<=v;i++)
+    {
+        for(int j=1;j<=v;j++)
+        {
+            printf("%d ",adj[i][j]);
+        }
+        printf("\n");
+    }
+}
+void floyd(int adj[][100],int v)
+{
+    for(int i=1;i<=v;i++)
+    for(int j=1;j<=v;j++)
+    {
+        if(adj[i][j]==-1)
+        adj[i][j]=INT_MAX;
+        else if(i!=j)
+        path[i][j]=j;
+    }
+
+    for(int k=1;k<=v;k++)
+    {
+        for(int i=1;i<=v;i++)
+        for(int j=1;j<=v;j++)
+        {
+            if(adj[i][k]==INT_MAX||adj[k][j]==INT_MAX)
+            continue;
+            if(adj[i][j]>adj[i][k]+adj[k][j])
+            {
+                adj[i][j]=adj[i][k]+adj[k][j];
+                path[i][j]=path[i][k];
+            }
+        }
+        if(k==v)
+        printf("Optimal Solution : \n");
+        else
+        printf("Intermediate step %d : \n",k);
+        print(adj,v);
+    }
+    for(int i=1;i<=v;i++)
+    for(int j=1;j<=v;j++)
+    if(adj[i][j]==INT_MAX)
+    adj[i][j]=-1;
+
+}
+int main()
+{
+    int v,edges;
+    printf("Enter no of vertices : ");
+    scanf("%d",&v);
+    int adj[100][100];
+    for(int i=1;i<=v;i++)
+    for(int j=1;j<=v;j++)
+    {
+        adj[i][j]=-1;
+        path[i][j]=0;
+    }
+
+    printf("Enter no of edges : ");
+    scanf("%d",&edges);
+
+    printf("Enter edges : (src,dest,weight)");
+    for(int i=0;i<edges;i++)
+    {
+        int src,dest,wt;
+        scanf("%d%d%d",&src,&dest,&wt);
+        adj[src][dest]=wt;
+        path[src][dest]=dest;
+    }
+    for(int i=1;i<=v;i++)
+    adj[i][i]=0;
+
+    floyd(adj,v);
+    printf("\nPATH : \n");
+    for(int i=1;i<=v;i++)
+    {
+        for(int j=1;j<=v;j++)
+        {
+            find(i,j,adj);
+        }
+    }
+    return 0;
+}
